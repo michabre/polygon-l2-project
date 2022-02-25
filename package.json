@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile": "npx hardhat run scripts/run.js",
+    "compile": "npx hardhat run scripts/run.js && make abi",
     "test": "npx hardhat test",
     "coverage": "hardhat coverage",
     "ganache": "npx hardhat run scripts/deploy.js --network ganache",
