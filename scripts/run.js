@@ -6,8 +6,14 @@ const main = async () => {
 
   console.log("Contract deployed to:", domainContract.address);
 
-  let txn = await domainContract.register("chill",  {value: hre.ethers.utils.parseEther('100')});
+  let txn = await domainContract.connect(owner).register("chill",  {value: hre.ethers.utils.parseEther('100')});
   await txn.wait();
+
+  let txn2 = await domainContract.connect(superCoder).register("bill",  {value: hre.ethers.utils.parseEther('100')});
+  await txn2.wait();
+
+  let txn2_setRecord = await domainContract.connect(superCoder).setRecord("chill", "")
+  await txn2_setRecord.wait();
 
   // How much money is in here?
   const balance = await hre.ethers.provider.getBalance(domainContract.address);
@@ -36,11 +42,9 @@ const main = async () => {
   console.log("Contract balance after withdrawal:", hre.ethers.utils.formatEther(contractBalance));
   console.log("Balance of owner after withdrawal:", hre.ethers.utils.formatEther(ownerBalance));
 
-  // const address = await domainContract.getAddress("chill");
-  // console.log("Owner of domain chill.wave:", address);
-
-  // const balance = await hre.ethers.provider.getBalance(domainContract.address);
-  // console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
+  const address = await domainContract.getAddress("chill");
+  console.log("Owner of domain chill.wave:", address);
+  console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
 }
 
 const runMain = async () => {
