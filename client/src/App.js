@@ -2,6 +2,13 @@
 import React, { useEffect, useState } from 'react'
 import { ethers } from "ethers"
 import contractAbi from './utils/contractABI.json'
+
+// At the very top of the file, after the other imports
+import polygonLogo from './assets/polygon-matic-logo.png'
+import ethLogo from './assets/ethereum-eth-logo.png';
+import { networks } from './utils/networks';
+import { FaWallet, FaEthereum } from "react-icons/fa"
+
 import "../src/styles/landing.css"
 
 const TWITTER_HANDLE = 'michabre';
@@ -13,22 +20,23 @@ const tld = '.wave';
 const CONTRACT_ADDRESS = '0xfE133fA9df9A34355e2255992B60e14878C44441' // ganache
 
 const App = () => {
-  const [currentAccount, setCurrentAccount] = useState("");
+  const [currentAccount, setCurrentAccount] = useState("")
   const [domain, setDomain] = useState("")
-  const [record, setRecord] = useState("");
+  const [record, setRecord] = useState("")
+  const [network, setNetwork] = useState('')
 
 	const connectWallet = async () => {
 		try {
 			const { ethereum } = window;
 
 			if (!ethereum) {
-				console.log("Get MetaMask -> https://metamask.io/");
+				console.log("Get MetaMask -> https://metamask.io/")
 				return;
 			}
 
-			const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-			console.log("Connected", accounts[0]);
-			setCurrentAccount(accounts[0]);
+			const accounts = await ethereum.request({ method: "eth_requestAccounts" })
+			console.log("Connected", accounts[0])
+			setCurrentAccount(accounts[0])
 		} catch (error) {
 			console.log(error)
 		}
@@ -39,25 +47,86 @@ const App = () => {
 
     if (!ethereum) {
         console.log("Make sure you have MetaMask!");
-        return;
+        return
     } else {
-        console.log("We have the ethereum object", ethereum);
+        console.log("We have the ethereum object", ethereum)
     }
-		const accounts = await ethereum.request({ method: 'eth_accounts' });
+		const accounts = await ethereum.request({ method: 'eth_accounts' })
 
 		if (accounts.length !== 0) {
-			const account = accounts[0];
-			console.log('Found an authorized account:', account);
-			setCurrentAccount(account);
+			const account = accounts[0]
+			console.log('Found an authorized account:', account)
+			setCurrentAccount(account)
 		} else {
-			console.log('No authorized account found');
+			console.log('No authorized account found')
 		}
+
+    // This is the new part, we check the user's network chain ID
+		const chainId = await ethereum.request({ method: 'eth_chainId' })
+		setNetwork(networks[chainId])
+
+		ethereum.on('chainChanged', handleChainChanged)
+		
+		// Reload the page when they change networks
+		function handleChainChanged(_chainId) {
+			window.location.reload()
+		}
+  }
+
+  const switchNetwork = async () => {
+    if (window.ethereum) {
+      try {
+        // Try to switch to the Mumbai testnet
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x13881' }], // Check networks.js for hexadecimal network ids
+        });
+      } catch (error) {
+        // This error code means that the chain we want has not been added to MetaMask
+        // In this case we ask the user to add it to their MetaMask
+        if (error.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {	
+                  chainId: '0x13881',
+                  chainName: 'Polygon Mumbai Testnet',
+                  rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+                  nativeCurrency: {
+                      name: "Mumbai Matic",
+                      symbol: "MATIC",
+                      decimals: 18
+                  },
+                  blockExplorerUrls: ["https://mumbai.polygonscan.com/"]
+                },
+              ],
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        console.log(error);
+      }
+    } else {
+      // If window.ethereum is not found then MetaMask is not installed
+      alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
+    } 
   }
 
 
 
   // Form to enter domain name and data
 	const renderInputForm = () => {
+    // If not on Polygon Mumbai Testnet, render the switch button
+    if (network !== 'Polygon Mumbai Testnet') {
+      return (
+        <div className="connect-wallet-container">
+          <h2 className='is-size-5 mb-3'>Please switch to <span className="has-text-weight-bold">Polygon Mumbai Testnet</span></h2>
+          <button className='button is-info' onClick={switchNetwork}>Click here to switch</button>
+        </div>
+      );
+    }
     return (
       <div className="box">
           <div className="field is-horizontal is-align-items-center">
@@ -154,6 +223,7 @@ const App = () => {
   // This runs our function when the page loads.
 	useEffect(() => {
 		checkIfWalletIsConnected();
+    console.log('Network', network)
 	}, [])
 
   return (
@@ -174,19 +244,15 @@ const App = () => {
                     </div>
                     <div id="navbarMenu" className="navbar-menu">
                         <div className="navbar-end">
-                            
-                        {!currentAccount && (
-                            <span className="navbar-item">
-                                <button className="button is-white is-outlined" onClick={connectWallet}>
-                                    <span>Connect</span>
-                                </button>
-                            </span>
-                        )}
-                            <span className="navbar-item">
-                                <a className="button is-white is-outlined" href="#">
-                                    <span>OpenSea</span>
-                                </a>
-                            </span>
+                          <span className="navbar-item">
+                            {/* <img alt="Network logo" className="logo" src={ network.includes("Polygon") ? polygonLogo : ethLogo} /> */}
+                            { currentAccount ? <button className="button is-white is-outlined"> Wallet: {currentAccount.slice(0, 6)}...{currentAccount.slice(-4)} </button> : <button className="button is-white is-outlined" onClick={connectWallet}><span>Connect</span></button> }
+                          </span>
+                          <span className="navbar-item">
+                              <a className="button is-white is-outlined" href="#">
+                                  <span>OpenSea</span>
+                              </a>
+                          </span>
                         </div>
                     </div>
                 </div>
