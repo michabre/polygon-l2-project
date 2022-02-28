@@ -2,32 +2,31 @@
 import React, { useEffect, useState } from 'react'
 import { ethers } from "ethers"
 import contractAbi from './utils/contractABI.json'
-
 import "../src/styles/landing.css"
+
+const TWITTER_HANDLE = 'michabre';
+const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 // Add the domain you will be minting
 const tld = '.wave';
-const CONTRACT_ADDRESS = '0x474A43CD7b031C03537625e378CB944Ee6bfE130';
+//const CONTRACT_ADDRESS = '0x474A43CD7b031C03537625e378CB944Ee6bfE130';
+const CONTRACT_ADDRESS = '0xfE133fA9df9A34355e2255992B60e14878C44441' // ganache
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [domain, setDomain] = useState("")
   const [record, setRecord] = useState("");
 
-  // Implement your connectWallet method here
 	const connectWallet = async () => {
 		try {
 			const { ethereum } = window;
 
 			if (!ethereum) {
-				alert("Get MetaMask -> https://metamask.io/");
+				console.log("Get MetaMask -> https://metamask.io/");
 				return;
 			}
 
-			// Fancy method to request access to account.
 			const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-		
-			// Boom! This should print out public address once we authorize Metamask.
 			console.log("Connected", accounts[0]);
 			setCurrentAccount(accounts[0]);
 		} catch (error) {
@@ -35,22 +34,17 @@ const App = () => {
 		}
 	}
 
-
-  // Gotta make sure this is async.
   const checkIfWalletIsConnected = async () => {
-      // First make sure we have access to window.ethereum
-      const { ethereum } = window;
+    const { ethereum } = window;
 
-      if (!ethereum) {
-          console.log("Make sure you have MetaMask!");
-          return;
-      } else {
-          console.log("We have the ethereum object", ethereum);
-      }
-      // Check if we're authorized to access the user's wallet
+    if (!ethereum) {
+        console.log("Make sure you have MetaMask!");
+        return;
+    } else {
+        console.log("We have the ethereum object", ethereum);
+    }
 		const accounts = await ethereum.request({ method: 'eth_accounts' });
 
-		// Users can have multiple authorized accounts, we grab the first one if its there!
 		if (accounts.length !== 0) {
 			const account = accounts[0];
 			console.log('Found an authorized account:', account);
@@ -60,35 +54,46 @@ const App = () => {
 		}
   }
 
+
+
   // Form to enter domain name and data
 	const renderInputForm = () => {
     return (
-      <div className="form-container">
-        <div className="first-row">
+      <div className="box">
+          <div className="field is-horizontal is-align-items-center">
+            <div className="field-body">
+              <div className="field width-100">
+                <p className="control">
+                  <input 
+                    className="input" 
+                    type="text" 
+                    onChange={e => setDomain(e.target.value)}
+                    value={domain} 
+                    placeholder="Enter a domain"
+                  />
+                </p>
+              </div>
+              <div className="field">
+                <p className="control">{tld}</p>
+                </div>
+            </div>
+          </div>
           <input
-            type="text"
-            value={domain}
-            placeholder="domain"
-            onChange={e => setDomain(e.target.value)}
-          />
-          <p className='tld'> {tld} </p>
-        </div>
-  
-        <input
-          type="text"
-          value={record}
-          placeholder='whats ur ninja power?'
-          onChange={e => setRecord(e.target.value)}
-        />
-  
-        <div className="button-container">
-          {/* Call the mintDomain function when the button is clicked*/}
-          <button className='cta-button mint-button' onClick={mintDomain}>
-            Mint
-          </button> 
-        </div>
-  
-      </div>
+            className="input" 
+					  type="text"
+					  value={record}
+					  placeholder='Describe this domain'
+					  onChange={e => setRecord(e.target.value)}
+				  />
+          <div className="buttons is-justify-content-center mt-3">
+            <button className='button is-info' onClick={mintDomain}>
+              Mint
+            </button>
+            <button className="button is-success">
+                Set data
+            </button>
+          </div>
+        </div>  
     );
   }
 
@@ -194,36 +199,22 @@ const App = () => {
                         <h1 className="title">
                             Wave Music Name Service
                         </h1>
-                        <h2 className="subtitle">
-                        Sed in libero ut nibh placerat accumsan. Pellentesque commodo eros a enim. Nam quam nunc, blandit vel, luctus pulvinar.
-                        </h2>
                         <div className="box">
-
-                        {currentAccount && renderInputForm()}
-
+                          {currentAccount && renderInputForm()}
                         </div>
-                        {/* <div className="box">
-                            <div className="field is-horizontal is-align-items-center">
-                              <div className="field-body">
-                                <div className="field">
-                                  <p className="control">
-                                    <input className="input" type="text" onChange={checkDomainNameAvailability} value={domainName} />
-                                  </p>
-                                </div>
-                              </div>
-                              <p className="control ml-3">
-                                    <a className="button is-info">
-                                        Check Availability
-                                    </a>
-                                </p>
-                             
-                            </div>  
-                        </div> */}
                     </div>
                 </div>
             </div>
 
-    </section>
+        <footer>
+          <a
+            className="footer-text"
+            href={TWITTER_LINK}
+            target="_blank"
+            rel="noreferrer"
+          >{`built with @${TWITTER_HANDLE}`}</a>
+        </footer>
+      </section>
     </div>
   );
 }
