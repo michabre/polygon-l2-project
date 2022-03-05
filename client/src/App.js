@@ -2,12 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import { ethers } from "ethers"
 import contractAbi from './utils/contractABI.json'
-
-// At the very top of the file, after the other imports
-import polygonLogo from './assets/polygon-matic-logo.png'
-import ethLogo from './assets/ethereum-eth-logo.png';
 import { networks } from './utils/networks';
-import { FaWallet, FaEdit, FaEthereum } from "react-icons/fa"
+import { FaWallet, FaEdit } from "react-icons/fa"
 
 import "../src/styles/landing.css"
 
@@ -22,7 +18,7 @@ const App = () => {
   const [currentAccount, setCurrentAccount] = useState("")
   const [domain, setDomain] = useState("")
   const [record, setRecord] = useState("")
-  const [network, setNetwork] = useState('')
+  const [network, setNetwork] = useState("")
   const [editing, setEditing] = useState(false)
   const [mints, setMints] = useState([])
   const [loading, setLoading] = useState("")
@@ -335,7 +331,7 @@ const editRecord = (name) => {
 	useEffect(() => {
 		checkIfWalletIsConnected();
     console.log('Network', network)
-	}, [])
+	}, [network])
 
   return (
     <div className="App">
