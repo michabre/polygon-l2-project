@@ -7,7 +7,7 @@ import contractAbi from './utils/contractABI.json'
 import polygonLogo from './assets/polygon-matic-logo.png'
 import ethLogo from './assets/ethereum-eth-logo.png';
 import { networks } from './utils/networks';
-import { FaWallet, FaEthereum } from "react-icons/fa"
+import { FaWallet, FaEdit, FaEthereum } from "react-icons/fa"
 
 import "../src/styles/landing.css"
 
@@ -16,7 +16,7 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 // Add the domain you will be minting
 const tld = '.wave';
-const CONTRACT_ADDRESS = '0x4a72De611657E6D100Caeecd8F2BBa5221EC29Db'
+const CONTRACT_ADDRESS = '0x6d274C37F40E5AE70709931Fcb30429c6f341893'
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("")
@@ -159,13 +159,11 @@ const App = () => {
 
           {/* If the editing variable is true, return the "Set record" and "Cancel" button */}
 					{editing ? (
-						<div className="button-container">
-							// This will call the updateDomain function we just made
-							<button className='cta-button mint-button' disabled={loading} onClick={updateDomain}>
+						<div className="buttons mt-3">
+							<button className='button is-primary' disabled={loading} onClick={updateDomain}>
 								Set record
 							</button>  
-							// This will let us get out of editing mode by setting editing to false
-							<button className='cta-button mint-button' onClick={() => {setEditing(false)}}>
+							<button className='button is-link' onClick={() => {setEditing(false)}}>
 								Cancel
 							</button>  
 						</div>
@@ -289,34 +287,33 @@ const App = () => {
     }
   }
 
-  // Add this render function next to your other render functions
 const renderMints = () => {
+  const options = ["is-primary", "is-link", "is-info", "is-success", "is-warning", "is-danger"]
+  const numberOfOptions = options.length
+  let optionCount = 0
 	if (currentAccount && mints.length > 0) {
 		return (
-			<div className="mint-container">
-				<p className="subtitle"> Recently minted domains!</p>
-				<div className="mint-list">
+      <>
+        <h3 className="title is-size-5"> Recently minted domains!</h3>
+				<div className="mint-list is-flex is-flex-wrap-wrap is-justify-content-flex-start is-align-content-baseline">
 					{ mints.map((mint, index) => {
+            let count = (optionCount < numberOfOptions) ? optionCount: 0 
+            optionCount++
 						return (
-							<div className="mint-item" key={index}>
+							<div className={`mint-item notification ${options[count]} p-3 m-3`} key={index}>
 								<div className='mint-row'>
 									<a className="link" href={`https://testnets.opensea.io/assets/mumbai/${CONTRACT_ADDRESS}/${mint.id}`} target="_blank" rel="noopener noreferrer">
 										<p className="underlined">{' '}{mint.name}{tld}{' '}</p>
 									</a>
-									{/* If mint.owner is currentAccount, add an "edit" button*/}
-									{ mint.owner.toLowerCase() === currentAccount.toLowerCase() ?
-										<button className="edit-button" onClick={() => editRecord(mint.name)}>
-											<img className="edit-icon" src="https://img.icons8.com/metro/26/000000/pencil.png" alt="Edit button" />
-										</button>
-										:
-										null
-									}
 								</div>
-					<p> {mint.record} </p>
-				</div>)
-				})}
+					      <p> {mint.record} </p>
+                { mint.owner.toLowerCase() === currentAccount.toLowerCase() ?
+                <span className="edit-record"><FaEdit onClick={() => editRecord(mint.name)} /></span>
+                :null}
+				      </div>)
+				  })}
 			</div>
-		</div>);
+    </>);
 	}
 };
 
@@ -333,13 +330,6 @@ const editRecord = (name) => {
       fetchMints();
     }
   }, [currentAccount, network]);
-
-  // Select Domain Name
-  // const checkDomainNameAvailability = (e) => {
-  //   let domain = e.target.value.replace(" ", "").toLowerCase()
-  //   setDomainName(domain)
-  // }
-
 
   // This runs our function when the page loads.
 	useEffect(() => {
@@ -366,11 +356,10 @@ const editRecord = (name) => {
                     <div id="navbarMenu" className="navbar-menu">
                         <div className="navbar-end">
                           <span className="navbar-item">
-                            {/* <img alt="Network logo" className="logo" src={ network.includes("Polygon") ? polygonLogo : ethLogo} /> */}
                             { currentAccount ? <button className="button is-white is-outlined"><FaWallet /> <span className="ml-3">{currentAccount.slice(0, 6)}...{currentAccount.slice(-4)}</span> </button> : <button className="button is-white is-outlined" onClick={connectWallet}><span>Connect</span></button> }
                           </span>
                           <span className="navbar-item">
-                              <a className="button is-white is-outlined" href="#">
+                              <a className="button is-white is-outlined" href="https://testnets.opensea.io/collection/wave-music-name-service-v3">
                                   <span>OpenSea</span>
                               </a>
                           </span>
@@ -387,21 +376,22 @@ const editRecord = (name) => {
                             Wave Music Name Service
                         </h1>
                         <div className="box">
-                          {/* {!currentAccount && renderNotConnectedContainer()} */}
                           {currentAccount && renderInputForm()}
+                        </div>                        
                           {mints && renderMints()}
-                        </div>
                     </div>
                 </div>
             </div>
 
-        <footer>
+        <footer className='py-3'>
+          <div className='container'>
           <a
             className="footer-text"
             href={TWITTER_LINK}
             target="_blank"
             rel="noreferrer"
-          >{`built with @${TWITTER_HANDLE}`}</a>
+          >{`built by @${TWITTER_HANDLE}`}</a>
+          </div>
         </footer>
       </section>
     </div>

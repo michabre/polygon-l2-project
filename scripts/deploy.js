@@ -5,20 +5,19 @@ const main = async () => {
   
     console.log("Contract deployed to:", domainContract.address);
   
-    // CHANGE THIS DOMAIN TO SOMETHING ELSE! I don't want to see OpenSea full of darksynths lol
-      let txn = await domainContract.register("darksynth",  {value: hre.ethers.utils.parseEther('0.1')});
-      await txn.wait();
-    console.log("Minted domain darksynth.wave");
+    // let txn = await domainContract.register("darksynth",  {value: hre.ethers.utils.parseEther('0.1')});
+    // await txn.wait();
+    // console.log("Minted domain darksynth.wave");
   
-    txn = await domainContract.setRecord("darksynth", "Am I a darksynth or just chillin??");
-    await txn.wait();
-    console.log("Set record for darksynth.wave");
+    // txn = await domainContract.setRecord("darksynth", "Am I a darksynth or just chillin??");
+    // await txn.wait();
+    // console.log("Set record for darksynth.wave");
   
-    const address = await domainContract.getAddress("darksynth");
-    console.log("Owner of domain darksynth:", address);
+    // const address = await domainContract.getAddress("darksynth");
+    // console.log("Owner of domain darksynth:", address);
   
-    const balance = await hre.ethers.provider.getBalance(domainContract.address);
-    console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
+    // const balance = await hre.ethers.provider.getBalance(domainContract.address);
+    // console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
   }
   
   const runMain = async () => {
